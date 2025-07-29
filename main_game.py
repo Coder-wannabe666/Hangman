@@ -23,7 +23,7 @@ for i in range(27):
 print("Welcome to hangman!")
 print("Your task is to guess the given clue")
 
-clue = "gduckling"
+clue = "picky eater"
 
 arr_clue = []
 for i in clue:
@@ -32,14 +32,32 @@ for i in clue:
 running = True
 number_of_mistakes = 0
 
+player_clue = ""
+
+for i in range(len(clue)):
+    if clue[i] != " ":
+        player_clue += "_"
+    else:
+        player_clue += " "
+
 while running == True:
     if number_of_mistakes == 8:
+        print("YOU LOST!!!!!")
         running = False
+
+    print(player_clue)
 
     given_char = get_chr(used_letters)
 
     if given_char in arr_clue:
-        print("test")
+        for i in range(len(clue)):
+            if clue[i] == given_char:
+                player_clue = player_clue[:i] + given_char + player_clue[i+1:]
+        if "_" not in player_clue:
+            print("YOU WON!!!")
+            print(f'The clue was "{clue}" ')
+            running = False
     else:
         number_of_mistakes +=1
+        print(f'You have {7-number_of_mistakes} lives left')
 
