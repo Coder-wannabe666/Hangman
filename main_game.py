@@ -1,4 +1,5 @@
 import string
+import requests
 
 def get_chr(used_letters):
     given_char = input("Input a character: ")
@@ -12,52 +13,74 @@ def get_chr(used_letters):
     used_letters[ord(given_char) - 97] = 1
     return given_char
 
-used_letters = []
+
 alphabet = []
 for i in string.ascii_lowercase:
     alphabet.append(i)
 
-for i in range(27):
-    used_letters.append(0)
+def get_secret_word_and_clue():
+    word_response = requests.get("https://random-word-api.herokuapp.com/word")
+    base_word = word_response.json()[0]
+    clue = None
+    return base_word, clue
 
-print("Welcome to hangman!")
-print("Your task is to guess the given clue")
 
-clue = "picky eater"
+def play():
 
-arr_clue = []
-for i in clue:
-    arr_clue.append(i)
+    used_letters = []
+    for i in range(27):
+        used_letters.append(0)
 
-running = True
-number_of_mistakes = 0
+    print("Welcome to hangman!")
+    print("Your task is to guess the given secret word")
 
-player_clue = ""
+    secret, clue = get_secret_word_and_clue()
 
-for i in range(len(clue)):
-    if clue[i] != " ":
-        player_clue += "_"
-    else:
-        player_clue += " "
 
-while running == True:
-    if number_of_mistakes == 8:
+    arr_secret = []
+    for i in secret:
+        arr_secret.append(i)
+
+    player_secret = ""
+
+    for i in range(len(secret)):
+        if secret[i] != " ":
+            player_secret += "_"
+        else:
+            player_secret += " "
+
+    number_of_mistakes = 0
+
+    def lose():
         print("YOU LOST!!!!!")
-        running = False
+        play()
 
-    print(player_clue)
+    while True:
+        if number_of_mistakes == 8:
+            lose()
 
-    given_char = get_chr(used_letters)
+        print(player_secret)
+        print(clue)
+        used = ""
+        for i in range(len(used_letters)):
+            if used_letters[i] == 1:
+                used += chr(i + 97)
 
-    if given_char in arr_clue:
-        for i in range(len(clue)):
-            if clue[i] == given_char:
-                player_clue = player_clue[:i] + given_char + player_clue[i+1:]
-        if "_" not in player_clue:
-            print("YOU WON!!!")
-            print(f'The clue was "{clue}" ')
-            running = False
-    else:
-        number_of_mistakes +=1
-        print(f'You have {7-number_of_mistakes} lives left')
+        print(f'Used characters: {used}')
+        given_char = get_chr(used_letters)
 
+        if given_char in arr_secret:
+            for i in range(len(secret)):
+                if secret[i] == given_char:
+                    player_secret = player_secret[:i] + given_char + player_secret[i+1:]
+            if "_" not in player_secret:
+                print("YOU WON!!!")
+                print(f'The secret word was "{secret}" ')
+                play()
+        else:
+            number_of_mistakes +=1
+            print(f'You have {8-number_of_mistakes} lives left')
+
+if __name__ == "__main__":
+    play()
+    # print(get_secret_word_and_clue())
