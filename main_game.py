@@ -1,5 +1,6 @@
 import string
 import requests
+import time
 
 def get_chr(used_letters):
     given_char = input("Input a character: ")
@@ -18,11 +19,26 @@ alphabet = []
 for i in string.ascii_lowercase:
     alphabet.append(i)
 
-def get_secret_word_and_clue():
-    word_response = requests.get("https://random-word-api.herokuapp.com/word")
+def get_secret_word():
+    word_response = requests.get("https://random-word-api.vercel.app/api?words=1")
     base_word = word_response.json()[0]
-    clue = None
-    return base_word, clue
+    # base_word = "apple"
+    return base_word
+
+def get_word_definition(base_word):
+    url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{base_word}'
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+
+        try:
+            first_definition = data[0]['meanings'][0]['definitions'][0]['definition']
+            return first_definition
+        except (KeyError, IndexError):
+            return "Definition not found in response"
+    else:
+        return f"API error: {response.status_code}"
 
 
 def play():
@@ -34,8 +50,8 @@ def play():
     print("Welcome to hangman!")
     print("Your task is to guess the given secret word")
 
-    secret, clue = get_secret_word_and_clue()
-
+    secret= get_secret_word()
+    clue = get_word_definition(secret)
 
     arr_secret = []
     for i in secret:
@@ -53,6 +69,8 @@ def play():
 
     def lose():
         print("YOU LOST!!!!!")
+        print(f'The secret word was "{secret}"')
+        time.sleep(5)
         play()
 
     while True:
@@ -83,4 +101,6 @@ def play():
 
 if __name__ == "__main__":
     play()
-    # print(get_secret_word_and_clue())
+    # base_word = get_secret_word()
+    # print(get_secret_word())
+    # print(get_word_definition(base_word))
