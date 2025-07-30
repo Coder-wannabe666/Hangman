@@ -69,7 +69,6 @@ def play():
     def lose():
         print("YOU LOST!!!!!")
         print(f'The secret word was "{secret}"')
-
         time.sleep(5)
         play()
 
