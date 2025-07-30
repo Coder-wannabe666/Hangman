@@ -22,7 +22,6 @@ for i in string.ascii_lowercase:
 def get_secret_word():
     word_response = requests.get("https://random-word-api.vercel.app/api?words=1")
     base_word = word_response.json()[0]
-    # base_word = "apple"
     return base_word
 
 def get_word_definition(base_word):
@@ -101,6 +100,3 @@ def play():
 
 if __name__ == "__main__":
     play()
-    # base_word = get_secret_word()
-    # print(get_secret_word())
-    # print(get_word_definition(base_word))
